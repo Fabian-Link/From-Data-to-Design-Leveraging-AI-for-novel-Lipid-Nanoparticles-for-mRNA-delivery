@@ -5,10 +5,17 @@ import pandas as pd
 from pathlib import Path
 from tqdm import tqdm
 
-def calculate_descriptors(smiles_excel_path, output_filename=None):
+def calculate_descriptors(smiles_file_path, output_filename=None):
     repo_root = Path(__file__).resolve().parent.parent
-    smiles_path = Path(smiles_excel_path)
-    df = pd.read_excel(smiles_path)
+    smiles_path = Path(smiles_file_path)
+    
+    # Check file extension and load accordingly
+    if smiles_path.suffix.lower() == ".csv":
+        df = pd.read_csv(smiles_path)
+    elif smiles_path.suffix.lower() in [".xls", ".xlsx"]:
+        df = pd.read_excel(smiles_path)
+    else:
+        raise ValueError(f"Unsupported file type: {smiles_path.suffix}")
 
     # Extract the SMILES column
     dataset = df[['SMILES']]

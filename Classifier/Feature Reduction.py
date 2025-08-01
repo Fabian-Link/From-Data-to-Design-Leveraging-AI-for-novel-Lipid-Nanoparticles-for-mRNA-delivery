@@ -5,13 +5,22 @@ from sklearn.preprocessing import StandardScaler
 from boruta import BorutaPy
 from sklearn.model_selection import train_test_split
 import pickle
+from pathlib import Path
+from Molecular_Descriptor_Calculation import calculate_descriptors
 
 ###################
 #Datapreprocessing#
 ###################
 
+repo_root = Path(__file__).resolve().parent.parent
+
+# Calculate descriptors from AGILE_Dataset.csv and save to All Data
+agile_dataset_path = repo_root / "Datasets" / "All Data" / "AGILE_Dataset.csv"
+descriptor_output_path = repo_root / "Datasets" / "All Data" / "AGILE_Dataset_Mordred_2d.csv"
+calculate_descriptors(agile_dataset_path, output_filename=descriptor_output_path)
+
 # Loading descriptors
-df_descriptors = pd.read_csv("AGILE_Dataset_Mordred_2d.csv", low_memory=False)
+df_descriptors = pd.read_csv(descriptor_output_path, low_memory=False)
 
 # Drop the SMILES column
 data = df_descriptors.drop(columns=['SMILES'])
@@ -41,7 +50,7 @@ constant_columns = [col for col in data.columns if data[col].nunique() == 1]
 data.drop(columns=constant_columns, inplace=True)
 
 # Adding Labels
-df_labels = pd.read_csv("AGILE_Dataset.csv", low_memory=False)
+df_labels = pd.read_csv(agile_dataset_path, low_memory=False)
 data_processed = pd.concat([df_labels[['expt_Hela']], data], axis=1)
 
 #################
@@ -73,11 +82,17 @@ X_unfiltered = scaled_features_df
 y_unfiltered = target
 X_train_unfiltered, X_test_unfiltered, y_train_unfiltered, y_test_unfiltered = train_test_split(X_unfiltered, y_unfiltered, test_size=0.2, random_state=42, stratify=y_unfiltered)
 
-# Save the data splits to a file
-with open("data_splits_scaled.pkl", "wb") as f:
-    pickle.dump((X_train_unfiltered, X_test_unfiltered, y_train_unfiltered, y_test_unfiltered, X_unfiltered , y_unfiltered), f)
+# Define output directory for splits
+splits_dir = repo_root / "Datasets" / "Datasplits" / "All Features"
+splits_dir.mkdir(parents=True, exist_ok=True)
 
-print("Data scaled successfully.")
+# Save each split as a CSV file
+X_train_unfiltered.to_csv(splits_dir / "X_train_unfiltered.csv", index=False)
+X_test_unfiltered.to_csv(splits_dir / "X_test_unfiltered.csv", index=False)
+y_train_unfiltered.to_csv(splits_dir / "y_train_unfiltered.csv", index=False)
+y_test_unfiltered.to_csv(splits_dir / "y_test_unfiltered.csv", index=False)
+
+print("Data splits saved as CSV files in:", splits_dir)
 
 ##########################
 #Boruta Feature Selection#
@@ -124,19 +139,26 @@ X_filtered_df = pd.DataFrame(scaled_X_filtered_df, columns=selected_features)
 X_filtered_with_smiles = pd.concat([df_descriptors[['SMILES']], X_filtered_df], axis=1)
 
 # Save the molecular descriptors in a .csv file
-output_filename = 'AGILE_Dataset_Boruta_finetuned_descriptors.csv'
+output_filename = repo_root / "Datasets" / "All Data" / "AGILE_Dataset_Boruta_feature_reduction.csv"
 X_filtered_with_smiles.to_csv(output_filename, index=False)
 
-print("CSV file saved successfully.")
+print("CSV file saved successfully at:", output_filename)
 
 # Split the data into training, validation, and testing sets (80-20 split)
 X = X_filtered_df
 y = target
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-# Save the data splits to a file
-with open("data_splits_feature_reduced.pkl", "wb") as f:
-    pickle.dump((X_test, y_test, X_train, y_train, X, y), f)
+# Save the data splits as CSV files
+splits_dir = repo_root / "Datasets" / "Datasplits" / "Reduced Features"
+splits_dir.mkdir(parents=True, exist_ok=True)
+
+X_train.to_csv(splits_dir / "X_train.csv", index=False)
+X_test.to_csv(splits_dir / "X_test.csv", index=False)
+y_train.to_csv(splits_dir / "y_train.csv", index=False)
+y_test.to_csv(splits_dir / "y_test.csv", index=False)
+
+print("Reduced feature data splits saved as CSV files in:", splits_dir)
 
 # Save the StandardScaler object using pickle
 with open("scaler.pkl", "wb") as f:
