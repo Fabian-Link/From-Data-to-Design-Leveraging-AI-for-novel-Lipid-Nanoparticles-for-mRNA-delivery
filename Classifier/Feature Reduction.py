@@ -107,8 +107,7 @@ np.bool = np.bool_
 rf = RandomForestClassifier(n_jobs=-1, class_weight='balanced', max_depth=5)
 
 # define Boruta feature selection method
-#feat_selector = BorutaPy(rf, n_estimators='auto', perc=100, alpha=0.05, two_step=True, max_iter=100, random_state=42, verbose=2)
-feat_selector = BorutaPy(rf, n_estimators='auto', random_state=42, verbose=2)
+feat_selector = BorutaPy(rf, n_estimators='auto', perc=100, alpha=0.05, two_step=True, max_iter=100, random_state=42, verbose=2)
 
 # find all relevant features
 feat_selector.fit(scaled_features_df.values, target.values)
@@ -162,7 +161,8 @@ y_test.to_csv(splits_dir / "y_test.csv", index=False)
 print("Reduced feature data splits saved as CSV files in:", splits_dir)
 
 # Save the StandardScaler object using pickle
-with open("scaler.pkl", "wb") as f:
-    pickle.dump(scaler_filtered , f)
+scaler_path = repo_root / "Classifier" / "scaler.pkl"
+with open(scaler_path, "wb") as f:
+    pickle.dump(scaler_filtered, f)
 
-print("Data preprocessed successfully.")
+print(f"Scaler saved successfully at: {scaler_path}")

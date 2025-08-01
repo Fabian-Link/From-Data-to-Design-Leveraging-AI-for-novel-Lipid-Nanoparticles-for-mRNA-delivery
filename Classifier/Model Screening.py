@@ -16,9 +16,9 @@ from xgboost import XGBClassifier
 repo_root = Path(__file__).resolve().parent.parent
 
 # Output directories
-experiments_dir = repo_root / "Experiments"
+experiments_dir = repo_root / "Classifier" / "Experiments"
 experiments_dir.mkdir(parents=True, exist_ok=True)
-models_dir = repo_root / "Models"
+models_dir = repo_root / "Classifier" / "Models"
 models_dir.mkdir(parents=True, exist_ok=True)
 
 # Load the Train-Test-Splits feature reduced
@@ -271,4 +271,4 @@ final_metrics = {
 }
 pd.DataFrame([final_metrics]).to_csv(experiments_dir / "Final_Model_Metrics.csv", index=False)
 
-print("All results and metrics have been saved.")
+print("All results and models saved successfully.")

@@ -51,7 +51,7 @@ for column in object_columns:
 X.fillna(0, inplace=True)
 
 # Load the saved scaler
-scaler_filename = Path(__file__).parent / "scaler.pkl"
+scaler_filename = repo_root / "Classifier" / "scaler.pkl"
 with open(scaler_filename, "rb") as f:
     scaler = pickle.load(f)
 X_scaled = scaler.transform(X)
