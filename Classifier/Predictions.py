@@ -6,7 +6,7 @@ from Tanimotot import run_tanimoto
 from Merge_Tanimotot_with_Predictions import merge_predictions_with_tanimoto
 
 ###################################
-# User input: Only change these two!
+# User input
 ###################################
 
 repo_root = Path(__file__).resolve().parent.parent

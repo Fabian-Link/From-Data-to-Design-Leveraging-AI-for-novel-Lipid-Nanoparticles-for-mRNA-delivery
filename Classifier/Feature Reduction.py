@@ -16,7 +16,7 @@ repo_root = Path(__file__).resolve().parent.parent
 
 # Calculate descriptors from AGILE_Dataset.csv and save to All Data
 agile_dataset_path = repo_root / "Datasets" / "All Data" / "AGILE_Dataset.csv"
-descriptor_output_path = repo_root / "Datasets" / "All Data" / "AGILE_Dataset_Mordred_2d.csv"
+descriptor_output_path = repo_root / "Datasets" / "All Data" / "AGILE_Dataset_Mordred_2d_descriptors.csv"
 calculate_descriptors(agile_dataset_path, output_filename=descriptor_output_path)
 
 # Loading descriptors
@@ -107,7 +107,8 @@ np.bool = np.bool_
 rf = RandomForestClassifier(n_jobs=-1, class_weight='balanced', max_depth=5)
 
 # define Boruta feature selection method
-feat_selector = BorutaPy(rf, n_estimators='auto', perc=100, alpha=0.05, two_step=True, max_iter=100, random_state=42, verbose=2)
+#feat_selector = BorutaPy(rf, n_estimators='auto', perc=100, alpha=0.05, two_step=True, max_iter=100, random_state=42, verbose=2)
+feat_selector = BorutaPy(rf, n_estimators='auto', random_state=42, verbose=2)
 
 # find all relevant features
 feat_selector.fit(scaled_features_df.values, target.values)
