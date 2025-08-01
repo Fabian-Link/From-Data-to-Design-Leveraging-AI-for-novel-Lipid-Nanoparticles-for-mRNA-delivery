@@ -18,12 +18,14 @@ from syba.syba import SybaClassifier
 
 from rdkit.Chem import MolToSmiles as mol2smi
 from rdkit import RDLogger
+from pathlib import Path
 
 ##############################################################################################
 #Modifying the SELFIE alphabet to only include tokens that are present in the seed structures#
 ##############################################################################################
 
-df = pd.read_csv("AGILE_Dataset.csv")
+repo_root = Path(__file__).resolve().parent.parent
+df = pd.read_csv(repo_root / "Datasets" / "All Data" / "AGILE_Dataset.csv")
 
 # Extract the SMILES column
 smiles_column = 'SMILES'
@@ -457,13 +459,16 @@ def filter_molecules_by_syba(syba, all_smiles, *molecule_sets):
 
 def save_filtered_sets(filtered_mols_syba_4, filtered_mols_syba_6, filtered_mols_syba_8):
     """
-    Save the filtered molecule sets to CSV files.
+    Save the filtered molecule sets to CSV files in the same folder as this script.
 
     Parameters:
     filtered_mols_syba_4 (list): Filtered molecules with similarity > 0.4.
     filtered_mols_syba_6 (list): Filtered molecules with similarity > 0.6.
     filtered_mols_syba_8 (list): Filtered molecules with similarity > 0.8.
     """
+    from pathlib import Path
+    script_dir = Path(__file__).parent
+
     smiles_4 = [mol2smi(mol) for mol in filtered_mols_syba_4]
     smiles_6 = [mol2smi(mol) for mol in filtered_mols_syba_6]
     smiles_8 = [mol2smi(mol) for mol in filtered_mols_syba_8]
@@ -472,11 +477,11 @@ def save_filtered_sets(filtered_mols_syba_4, filtered_mols_syba_6, filtered_mols
     df_6 = pd.DataFrame(smiles_6, columns=['SMILES'])
     df_8 = pd.DataFrame(smiles_8, columns=['SMILES'])
 
-    df_4.to_csv("AIRMAIL_STONED_generated_ionizablelipids_positive_sim_04_mut10_smiles.csv", index=False)
-    df_6.to_csv("AIRMAIL_STONED_generated_ionizablelipids_positive_sim_06_mut10_smiles.csv", index=False)
-    df_8.to_csv("AIRMAIL_STONED_generated_ionizablelipids_positive_sim_08_mut10_smiles.csv", index=False)
+    df_4.to_csv(script_dir / "AIRMAIL_STONED_generated_ionizablelipids_positive_sim_04_mut10_smiles.csv", index=False)
+    df_6.to_csv(script_dir / "AIRMAIL_STONED_generated_ionizablelipids_positive_sim_06_mut10_smiles.csv", index=False)
+    df_8.to_csv(script_dir / "AIRMAIL_STONED_generated_ionizablelipids_positive_sim_08_mut10_smiles.csv", index=False)
 
-    print("Filtered molecule sets saved to CSV files.")
+    print("Filtered molecule sets saved to CSV files in:", script_dir)
 
 # Use the function to filter molecules in one go
 filtered_smiles_syba_all, filtered_mols_syba_4, filtered_mols_syba_6, filtered_mols_syba_8 = filter_molecules_by_syba(
