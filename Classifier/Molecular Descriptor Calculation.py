@@ -2,10 +2,13 @@ from rdkit import Chem, RDLogger
 import mordred
 from mordred import Calculator, descriptors
 import pandas as pd
+from pathlib import Path
 
 def main():
     # Load Dataset
-    df = pd.read_excel('Homoserine_all.xlsx')
+    repo_root = Path(__file__).resolve().parent.parent
+    smiles_path = repo_root / 'Predictions' / 'Validation' / 'XY-Lipids_smiles.xlsx'
+    df = pd.read_excel(smiles_path)
 
     # Extract the SMILES column
     dataset = df[['SMILES']]
@@ -29,10 +32,10 @@ def main():
     df_mordred_2d = pd.concat([dataset['SMILES'], all_desc], axis=1)
 
     # Save the molecular descriptors in a .csv file
-    output_filename = 'Homoserine_all_Mordred_2d.csv'
+    output_filename =  smiles_path.parent / 'XY-Lipids_all_Mordred_2d.csv'
     df_mordred_2d.to_csv(output_filename, index=False)
 
-    print("csv file saved successfully.")
+    print("csv file saved successfully at:", output_filename)
 
 if __name__ == "__main__":
     main()

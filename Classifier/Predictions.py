@@ -1,16 +1,22 @@
 import pandas as pd
 import pickle
+from pathlib import Path
 
 ###################################
 # Preprocessing the Descriptor set#
 ###################################
 
+# Define repo root
+repo_root = Path(__file__).resolve().parent.parent
+
 # Load training data and extract features
-df_train = pd.read_csv("AGILE_Dataset_Boruta_finetuned_descriptors.csv")
+train_path = repo_root / "Datasets" / "All Data" / "AGILE_Dataset_Boruta_feature_reduction.csv"
+df_train = pd.read_csv(train_path)
 train_features = df_train.drop(columns=["SMILES"]).columns
 
 # Load prediction data and filter using training features
-df_pred = pd.read_csv("Homoserine_all_Mordred_2d.csv")
+pred_path = repo_root / "Predictions" / "Validation" / "XY-Lipids_all_Mordred_2d.csv"
+df_pred = pd.read_csv(pred_path)
 df_filtered = df_pred[train_features].copy()
 
 # Add the SMILES column back to the filtered dataframe
@@ -33,7 +39,7 @@ for column in object_columns:
 X.fillna(0, inplace=True)
 
 # Load the saved scaler
-scaler_filename = "scaler.pkl"
+scaler_filename = Path(__file__).parent / "scaler.pkl"
 with open(scaler_filename, "rb") as f:
     scaler = pickle.load(f)
 
@@ -48,7 +54,7 @@ df_X_scaled = pd.DataFrame(X_scaled, columns=X.columns)
 ##############
 
 # Load the saved model
-best_model_filename = "xgb_final.pkl"
+best_model_filename = Path(__file__).parent / "Models" / "xgb_final.pkl"
 with open(best_model_filename, "rb") as f:
     best_model = pickle.load(f)
 
@@ -67,7 +73,7 @@ result_df = pd.DataFrame({
 result_df = result_df.sort_values(by=['Class', 'Probability'], ascending=[False, False])
 
 # Save the molecular descriptors in a .csv file
-output_filename = 'Homoserine_all_Predictions.xlsx'
+output_filename = repo_root / "Predictions" / "Validation" / "XY-Lipids_Predictions.xlsx"
 result_df.to_excel(output_filename, index=False)
 
-print("CSV file saved successfully.")
+print("CSV file saved successfully at:", output_filename)
