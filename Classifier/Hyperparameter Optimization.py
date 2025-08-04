@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import pickle
+from pathlib import Path
 
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score, accuracy_score
@@ -13,15 +14,50 @@ from xgboost import XGBClassifier
 
 from typing import Any, Dict, Union, Callable
 
-# Load the Train-Test-Splits
-with open("data_splits_feature_reduced.pkl", "rb") as f:
-    X_test, y_test, X_train, y_train, X, y = pickle.load(f)
+repo_root = Path(__file__).resolve().parent.parent
+
+# Load the Train-Test-Splits feature reduced
+splits_dir_reduced = repo_root / "Datasets" / "Datasplits" / "Reduced Features"
+X_train = pd.read_csv(splits_dir_reduced / "X_train.csv")
+X_test = pd.read_csv(splits_dir_reduced / "X_test.csv")
+y_train = pd.read_csv(splits_dir_reduced / "y_train.csv").squeeze()
+y_test = pd.read_csv(splits_dir_reduced / "y_test.csv").squeeze()
+
+# Load the Train-Test-Splits scaled
+splits_dir_all = repo_root / "Datasets" / "Datasplits" / "All Features"
+X_train_unfiltered = pd.read_csv(splits_dir_all / "X_train_unfiltered.csv")
+X_test_unfiltered = pd.read_csv(splits_dir_all / "X_test_unfiltered.csv")
+y_train_unfiltered = pd.read_csv(splits_dir_all / "y_train_unfiltered.csv").squeeze()
+y_test_unfiltered = pd.read_csv(splits_dir_all / "y_test_unfiltered.csv").squeeze()
+
+# Full X and y for feature reduced and scaled
+X = pd.concat([X_train, X_test], axis=0).reset_index(drop=True)
+y = pd.concat([y_train, y_test], axis=0).reset_index(drop=True)
+X_unfiltered = pd.concat([X_train_unfiltered, X_test_unfiltered], axis=0).reset_index(drop=True)
+y_unfiltered = pd.concat([y_train_unfiltered, y_test_unfiltered], axis=0).reset_index(drop=True)
 
 # Ensure X_train and y_train are dataframes
 X_train = pd.DataFrame(X_train)
 y_train = pd.DataFrame(y_train)
 X_test = pd.DataFrame(X_test)
 y_test = pd.DataFrame(y_test)
+
+def trial2df(trial):
+    """
+    Convert a Trial object (sequence of trial dictionaries)
+    to a Pandas DataFrame.
+    """
+    vals = []
+    for t in trial:
+        result = t['result']
+        misc = t['misc']
+        val = {k:(v[0] if isinstance(v, list) else v)
+        for k,v in misc['vals'].items()
+            }
+        val['loss'] = result['loss']
+        val['tid'] = t['tid']
+        vals.append(val)
+    return pd.DataFrame(vals)
 
 #######################################
 # Hyperparameter Optimization XGBoost #
@@ -90,6 +126,13 @@ best = fmin(
 
 print(best)
 
+# Save Boruta progress to CSV for visualization
+experiments_dir = repo_root / "Classifier" / "Experiments"
+experiments_dir.mkdir(parents=True, exist_ok=True)
+df_xgb_trials = trial2df(trials.trials)
+df_xgb_trials.to_csv(experiments_dir / "xgb_hyperopt_trials.csv", index=False)
+print(f"xgb hyperopt trials saved at: {experiments_dir / 'xgb_hyperopt_trials.csv'}")
+
 # Selecting best parameters
 params = {'colsample_bytree': 0.3137816316738625, 
           'gamma': 0.00592667549172721, 
@@ -133,8 +176,8 @@ print(f'Cross-Validation AUC: {cv_results.mean():.6f} ± {cv_results.std():.6f}'
 print(f'XGBoost - Test Set: Accuracy: {accuracy_test:.6f}, Precision: {precision_test:.6f}, Recall: {recall_test:.6f}, F1 score: {f1_test:.6f}, AUC: {auc_test:.6f}')
 
 # Save the optimized model
-with open('xgb_opti_model.pkl', 'wb') as f:
-    pickle.dump(xgb_opt, f)
+#with open('xgb_opti_model.pkl', 'wb') as f:
+    #pickle.dump(xgb_opt, f)
 
 #############################################
 # Hyperparameter Optimization Random Forest #
@@ -197,11 +240,18 @@ best_rf = fmin(
     fn=lambda space: hyperparameter_tuning_rf(space, X_train, y_train),  # Objective function
     space=options_rf,  # Hyperparameter search space
     algo=tpe.suggest,  # Optimization algorithm Tree-structured Parzen Estimator (Expected Improvement)
-    max_evals=1000,  # Maximum evaluations
+    max_evals=10,  # Maximum evaluations
     trials=trials_rf,  # Trials object
 )
 
 print(best_rf)
+
+# Save Boruta progress to CSV for visualization
+experiments_dir = repo_root / "Classifier" / "Experiments"
+experiments_dir.mkdir(parents=True, exist_ok=True)
+df_rf_trials = trial2df(trials_rf.trials)
+df_rf_trials.to_csv(experiments_dir / "rf_hyperopt_trials.csv", index=False)
+print(f"rf hyperopt trials saved at: {experiments_dir / 'rf_hyperopt_trials.csv'}")
 
 # Selecting best parameters
 best_rf_params = {
@@ -244,8 +294,8 @@ print(f'Cross-Validation AUC (RF): {cv_rf_results.mean():.6f} ± {cv_rf_results.
 print(f'RandomForest - Test Set: Accuracy: {rf_accuracy_test:.6f}, Precision: {rf_precision_test:.6f}, Recall: {rf_recall_test:.6f}, F1 score: {rf_f1_test:.6f}, AUC: {rf_auc_test:.6f}')
 
 # Save the optimized RandomForest model
-with open('rf_opti_model.pkl', 'wb') as f:
-    pickle.dump(rf_opt, f)
+#with open('rf_opti_model.pkl', 'wb') as f:
+    #pickle.dump(rf_opt, f)
 
 ##################################################
 # Hyperparameter Optimization LogisticRegression #
@@ -307,11 +357,18 @@ best_lr = fmin(
     fn=lambda space: hyperparameter_tuning_lr(logistic_regression_filter_space(space), X_train, y_train),  # Objective function
     space=options_lr,  # Hyperparameter search space
     algo=tpe.suggest,  # Optimization algorithm Tree-structured Parzen Estimator (Expected Improvement)
-    max_evals=1000,  # Maximum evaluations
+    max_evals=10,  # Maximum evaluations
     trials=trials_lr,  # Trials object
 )
 
 print(best_lr)
+
+# Save Boruta progress to CSV for visualization
+experiments_dir = repo_root / "Classifier" / "Experiments"
+experiments_dir.mkdir(parents=True, exist_ok=True)
+df_lr_trials = trial2df(trials_lr.trials)
+df_lr_trials.to_csv(experiments_dir / "lr_hyperopt_trials.csv", index=False)
+print(f"lr hyperopt trials saved at: {experiments_dir / 'lr_hyperopt_trials.csv'}")
 
 # Selecting best parameters
 best_lr_params = {
@@ -353,5 +410,5 @@ print(f'Cross-Validation AUC (LR): {cv_lr_results.mean():.6f} ± {cv_lr_results.
 print(f'LogisticRegression - Test Set: Accuracy: {lr_accuracy_test:.6f}, Precision: {lr_precision_test:.6f}, Recall: {lr_recall_test:.6f}, F1 score: {lr_f1_test:.6f}, AUC: {lr_auc_test:.6f}')
 
 # Save the optimized Logistic Regression model
-with open('lr_opti_model.pkl', 'wb') as f:
-    pickle.dump(lr_opt, f)
+#with open('lr_opti_model.pkl', 'wb') as f:
+    #pickle.dump(lr_opt, f)
