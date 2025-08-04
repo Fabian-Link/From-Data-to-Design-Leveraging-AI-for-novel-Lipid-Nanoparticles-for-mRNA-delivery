@@ -126,7 +126,7 @@ best = fmin(
 
 print(best)
 
-# Save Boruta progress to CSV for visualization
+# Save hyperopt progress to CSV for visualization
 experiments_dir = repo_root / "Classifier" / "Experiments"
 experiments_dir.mkdir(parents=True, exist_ok=True)
 df_xgb_trials = trial2df(trials.trials)
@@ -246,7 +246,7 @@ best_rf = fmin(
 
 print(best_rf)
 
-# Save Boruta progress to CSV for visualization
+# Save hyperopt progress to CSV for visualization
 experiments_dir = repo_root / "Classifier" / "Experiments"
 experiments_dir.mkdir(parents=True, exist_ok=True)
 df_rf_trials = trial2df(trials_rf.trials)
@@ -363,7 +363,7 @@ best_lr = fmin(
 
 print(best_lr)
 
-# Save Boruta progress to CSV for visualization
+# Save hyperopt progress to CSV for visualization
 experiments_dir = repo_root / "Classifier" / "Experiments"
 experiments_dir.mkdir(parents=True, exist_ok=True)
 df_lr_trials = trial2df(trials_lr.trials)
