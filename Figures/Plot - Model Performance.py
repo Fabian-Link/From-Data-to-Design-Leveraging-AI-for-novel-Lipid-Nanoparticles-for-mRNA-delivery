@@ -1,0 +1,66 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import pickle
+from pathlib import Path
+from sklearn.metrics import roc_curve, auc, confusion_matrix, ConfusionMatrixDisplay
+from matplotlib.colors import ListedColormap
+
+from plot_style import set_plot_style
+set_plot_style()
+
+repo_root = Path(__file__).resolve().parent.parent
+
+# Load test data
+splits_dir_reduced = repo_root / "Datasets" / "Datasplits" / "Reduced Features"
+X_test = pd.read_csv(splits_dir_reduced / "X_test.csv")
+y_test = pd.read_csv(splits_dir_reduced / "y_test.csv")
+y_true = y_test['HeLa_label'] if 'HeLa_label' in y_test.columns else y_test
+
+# Load XGBoost model
+model_path = repo_root / "Classifier" / "Models" / "xgb_opt_rfe.pkl"
+with open(model_path, "rb") as f:
+    xgb_model = pickle.load(f)
+
+# Predict probabilities and labels
+y_proba = xgb_model.predict_proba(X_test)[:, 1]
+y_pred = xgb_model.predict(X_test)
+
+# Get colors from plot_style
+colors = [c['color'] for c in plt.rcParams['axes.prop_cycle']]
+custom_cmap = ListedColormap([colors[0], colors[2]])
+
+# --- ROC Curve ---
+fpr, tpr, thresholds = roc_curve(y_true, y_proba)
+roc_auc = auc(fpr, tpr)
+plt.figure()
+plt.plot(fpr, tpr, color=colors[2], lw=2, label=f"ROC curve (AUC = {roc_auc:.2f})")
+plt.plot([0, 1], [0, 1], color=colors[0], lw=1, linestyle="--", label="Random chance")
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("Receiver Operating Characteristic (ROC) Curve")
+plt.legend()
+plt.tight_layout()
+
+pdf_dir = repo_root / "Figures" / "PDF"
+pdf_dir.mkdir(parents=True, exist_ok=True)
+roc_path = pdf_dir / "XGB_ROC_Curve.pdf"
+plt.savefig(roc_path)
+plt.close()
+
+print(f"ROC curve saved as PDF at: {roc_path}")
+
+# --- Confusion Matrix ---
+cm = confusion_matrix(y_true, y_pred)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+fig, ax = plt.subplots()
+disp.plot(ax=ax, cmap=custom_cmap, colorbar=False)
+plt.title("Confusion Matrix")
+plt.tight_layout()
+
+cm_path = pdf_dir / "XGB_Confusion_Matrix.pdf"
+plt.savefig(cm_path)
+plt.close()
+
+print(f"Confusion matrix saved as PDF at: {cm_path}")
