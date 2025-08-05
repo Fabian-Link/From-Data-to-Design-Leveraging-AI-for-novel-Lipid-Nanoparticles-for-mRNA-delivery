@@ -91,7 +91,7 @@ np.float = np.float64
 np.bool = np.bool_
 
 rf = RandomForestClassifier(n_jobs=-1, class_weight='balanced', max_depth=5)
-feat_selector = BorutaPy(rf, n_estimators='auto', perc=100, alpha=0.05, two_step=True, max_iter=100, random_state=42, verbose=2)
+feat_selector = BorutaPy(rf, n_estimators='auto', perc=100, alpha=0.005, two_step=True, max_iter=100, random_state=42, verbose=2)
 
 # Capture stdout during BorutaPy fit
 old_stdout = sys.stdout
