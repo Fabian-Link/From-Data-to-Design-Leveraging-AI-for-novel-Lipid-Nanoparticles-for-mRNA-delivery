@@ -38,10 +38,11 @@ for param in hyperparams:
         x_vals, df_trials['roc_auc'],
         c=df_trials['tid'], cmap='viridis', alpha=0.6
     )
-    plt.xlabel(param)
-    plt.ylabel("ROC AUC Score")
-    plt.title(f"Hyperopt Trials: {param} vs ROC AUC")
+    plt.xlabel(param, fontsize=30, fontweight='bold')
+    plt.ylabel("ROC AUC Score", fontsize=30, fontweight='bold')
+    plt.title(f"Hyperopt Trials: {param} vs ROC AUC", fontsize=30, fontweight='bold')
     plt.colorbar(sc, label="Trial Iteration")
+    plt.legend(fontsize=30, prop={'weight': 'bold'})
     plt.tight_layout()
     pdf_path = pdf_dir / f"XGB_Hyperopt_{param}_Scatter.pdf"
     plt.savefig(pdf_path)

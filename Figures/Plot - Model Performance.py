@@ -45,10 +45,10 @@ plt.plot(fpr, tpr, color=colors[2], lw=2, label=f"ROC curve (AUC = {roc_auc:.2f}
 plt.plot([0, 1], [0, 1], color=colors[0], lw=1, linestyle="--", label="Random chance")
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("Receiver Operating Characteristic (ROC) Curve")
-plt.legend()
+plt.xlabel("False Positive Rate", fontsize=30, fontweight='bold')
+plt.ylabel("True Positive Rate", fontsize=30, fontweight='bold')
+plt.title("Receiver Operating Characteristic (ROC) Curve", fontsize=30, fontweight='bold')
+plt.legend(fontsize=30, prop={'weight': 'bold'})
 plt.tight_layout()
 
 pdf_dir = repo_root / "Figures" / "PDF"
@@ -64,7 +64,7 @@ cm = confusion_matrix(y_true, y_pred)
 disp = ConfusionMatrixDisplay(confusion_matrix=cm)
 fig, ax = plt.subplots()
 disp.plot(ax=ax, cmap=custom_cmap, colorbar=False)
-plt.title("Confusion Matrix")
+plt.title("Confusion Matrix", fontsize=30, fontweight='bold')
 plt.tight_layout()
 
 cm_path = pdf_dir / "XGB_Confusion_Matrix.pdf"
@@ -89,10 +89,10 @@ visualizer.fit(X_train, y_train)
 
 # Apply unified style to the plot
 set_plot_style()
-plt.title("Learning Curve XGBClassifier")
-plt.xlabel("Training Instances")
-plt.ylabel("Score")
-plt.legend(["Training Score", "CV Score"])
+plt.title("Learning Curve XGBClassifier", fontsize=30, fontweight='bold')
+plt.xlabel("Training Instances", fontsize=30, fontweight='bold')
+plt.ylabel("Score", fontsize=30, fontweight='bold')
+plt.legend(["Training Score", "CV Score"], fontsize=30, prop={'weight': 'bold'})
 plt.tight_layout()
 
 # Save the plot as PDF
@@ -116,11 +116,11 @@ plt.axhline(
     mean_auc, color=colors[2], linestyle='--', linewidth=2,
     label=f'Mean AUC ({mean_auc:.2f})'
 )
-plt.xlabel("Train-test Split (Seed)")
-plt.ylabel("ROC AUC Score")
-plt.title("Model Stability - XGBClassifier")
-plt.ylim(0.6, 1.05)  # Set y-axis limit for better visibility
-plt.legend()
+plt.xlabel("Train-test Split (Seed)", fontsize=30, fontweight='bold')
+plt.ylabel("ROC AUC Score", fontsize=30, fontweight='bold')
+plt.title("Model Stability - XGBClassifier", fontsize=30, fontweight='bold')
+plt.ylim(0.7, 1.05)
+plt.legend(fontsize=30, prop={'weight': 'bold'})
 plt.tight_layout()
 
 stability_path = pdf_dir / "Model_Stability_XGBClassifier.pdf"

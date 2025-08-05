@@ -51,10 +51,10 @@ for label in sorted(set(labels_reduced)):
         c=label_colors[label], label=f"HeLa Label {label}",
         alpha=1, edgecolor='none', s=40
     )
-plt.xlabel('UMAP 1')
-plt.ylabel('UMAP 2')
-plt.title('UMAP - Reduced Features')
-plt.legend()
+plt.xlabel('UMAP 1', fontsize=30, fontweight='bold')
+plt.ylabel('UMAP 2', fontsize=30, fontweight='bold')
+plt.title('UMAP - Reduced Features', fontsize=30, fontweight='bold')
+plt.legend(fontsize=30, prop={'weight': 'bold'})
 plt.tight_layout()
 pdf_dir = repo_root / "Figures" / "PDF"
 pdf_dir.mkdir(parents=True, exist_ok=True)
@@ -81,10 +81,10 @@ for label in sorted(set(labels_all)):
         c=label_colors[label], label=f"HeLa Label {label}",
         alpha=1, edgecolor='none', s=40
     )
-plt.xlabel('UMAP 1')
-plt.ylabel('UMAP 2')
-plt.title('UMAP - All Features')
-plt.legend()
+plt.xlabel('UMAP 1', fontsize=30, fontweight='bold')
+plt.ylabel('UMAP 2', fontsize=30, fontweight='bold')
+plt.title('UMAP - All Features', fontsize=30, fontweight='bold')
+plt.legend(fontsize=30, prop={'weight': 'bold'})
 plt.tight_layout()
 pdf_path_all = pdf_dir / "UMAP_HeLa_Label_All.pdf"
 plt.savefig(pdf_path_all)
