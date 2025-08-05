@@ -28,7 +28,7 @@ pdf_dir.mkdir(parents=True, exist_ok=True)
 hyperparams = [col for col in df_trials.columns if col not in ['loss', 'roc_auc', 'tid']]
 
 for param in hyperparams:
-    #plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(12, 8))
     # Jitter for integer/discrete params
     if df_trials[param].dtype in [np.int64, np.int32]:
         x_vals = jitter(df_trials, param, amount=0.5)

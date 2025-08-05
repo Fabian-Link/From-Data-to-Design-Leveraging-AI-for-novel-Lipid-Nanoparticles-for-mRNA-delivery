@@ -120,7 +120,7 @@ best = fmin(
     fn=lambda space: hyperparameter_tuning(space, X_train, y_train),  # Objective function
     space=options,  # Hyperparameter search space
     algo=tpe.suggest,  # Optimization algorithm Tree-structured Parzen Estimator (Expected Improvement)
-    max_evals=10,  # Maximum evaluations
+    max_evals=1000,  # Maximum evaluations
     trials=trials,  # Trials object
 )
 
@@ -240,7 +240,7 @@ best_rf = fmin(
     fn=lambda space: hyperparameter_tuning_rf(space, X_train, y_train),  # Objective function
     space=options_rf,  # Hyperparameter search space
     algo=tpe.suggest,  # Optimization algorithm Tree-structured Parzen Estimator (Expected Improvement)
-    max_evals=10,  # Maximum evaluations
+    max_evals=1000,  # Maximum evaluations
     trials=trials_rf,  # Trials object
 )
 
@@ -357,7 +357,7 @@ best_lr = fmin(
     fn=lambda space: hyperparameter_tuning_lr(logistic_regression_filter_space(space), X_train, y_train),  # Objective function
     space=options_lr,  # Hyperparameter search space
     algo=tpe.suggest,  # Optimization algorithm Tree-structured Parzen Estimator (Expected Improvement)
-    max_evals=10,  # Maximum evaluations
+    max_evals=1000,  # Maximum evaluations
     trials=trials_lr,  # Trials object
 )
 

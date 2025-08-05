@@ -4,7 +4,7 @@ import seaborn as sns
 def set_plot_style():
     # General matplotlib style
     plt.rcParams.update({
-        "figure.figsize": (10, 7),
+        "figure.figsize": (12, 8),
         "axes.titlesize": 18,
         "axes.labelsize": 16,
         "axes.labelweight": "bold",
