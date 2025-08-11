@@ -1,4 +1,4 @@
-def run_tanimoto(training_csv, new_molecules_excel, output_file):
+def run_tanimoto(training_csv, new_molecules_file, output_file):
     from pathlib import Path
     import pandas as pd
     import numpy as np
@@ -19,8 +19,11 @@ def run_tanimoto(training_csv, new_molecules_excel, output_file):
     training_df = pd.read_csv(training_csv, usecols=['SMILES'])
     training_smiles = training_df['SMILES'].dropna().tolist()
 
-    # Load new molecules
-    new_df = pd.read_excel(new_molecules_excel, usecols=['SMILES'])
+    # Load new molecules (auto-detect file type)
+    if str(new_molecules_file).lower().endswith(('.xlsx', '.xls')):
+        new_df = pd.read_excel(new_molecules_file, usecols=['SMILES'])
+    else:
+        new_df = pd.read_csv(new_molecules_file, usecols=['SMILES'])
     new_smiles = new_df['SMILES'].dropna().tolist()
     
     # Compute fingerprints for training set
@@ -39,5 +42,10 @@ def run_tanimoto(training_csv, new_molecules_excel, output_file):
         average_distances.append(avg_distance)
     
     new_df['Average_Tanimoto_Distance'] = average_distances
-    new_df.to_excel(output_file, index=False)
+
+    # Save output in the same format as output_file extension
+    if str(output_file).lower().endswith(('.xlsx', '.xls')):
+        new_df.to_excel(output_file, index=False)
+    else:
+        new_df.to_csv(output_file, index=False)
     return new_df

@@ -2,8 +2,8 @@ import pandas as pd
 import pickle
 from pathlib import Path
 from Molecular_Descriptor_Calculation import calculate_descriptors
-from Classifier.Tanimoto import run_tanimoto
-from Classifier.Merge_Tanimoto_with_Predictions import merge_predictions_with_tanimoto
+from Tanimoto import run_tanimoto
+from Merge_Tanimoto_with_Predictions import merge_predictions_with_tanimoto
 
 ###################################
 # User input

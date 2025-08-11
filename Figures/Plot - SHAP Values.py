@@ -47,9 +47,9 @@ for spine in ax.spines.values():
     spine.set_color('grey')
 
 plt.grid(False)
-plt.xlabel('Shapley Values', fontsize=30, fontweight='bold')
-plt.ylabel('Features', fontsize=30, fontweight='bold')
-plt.title('SHAP Beeswarm Plot', fontsize=30, fontweight='bold')
+plt.xlabel('Shapley Values', fontsize=20, fontweight='bold')
+plt.ylabel('Features', fontsize=20, fontweight='bold')
+plt.title('SHAP Beeswarm Plot', fontsize=20, fontweight='bold')
 plt.tight_layout()
 
 # Save as PDF
