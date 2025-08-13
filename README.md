@@ -2,7 +2,7 @@
 A Python-based platform for data-driven discovery of ionizable lipids in lipid nanoparticle (LNP) formulations
 
 # Description
-This repository contains all code used on our study.
+This repository contains all code used in our study.
 
 - Abstract
 - Requirements
@@ -18,12 +18,12 @@ Designing novel molecules is a complex task traditionally performed by experts i
 # Requirements
 The code base uses Python 3.10 and primarily depends on:
 
-Boruta==0.4.3
-mordredcommunity==2.0.5
-rdkit==2022.9.5
-scikit-learn==1.5.2
-selfies==2.1.1
-xgboost==2.0.3
+- Boruta==0.4.3
+- mordredcommunity==2.0.5
+- rdkit==2022.9.5
+- scikit-learn==1.5.2
+- selfies==2.1.1
+- xgboost==2.0.3
 
 for a more detailed list few the requirements.txt file
 
