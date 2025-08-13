@@ -33,16 +33,17 @@ pip install -r requirements.txt
 ````
 
 # Usage
-1. Prepare your input file
+1. **Prepare your input file**
 
 - Format: .csv or .xlsx
 
 - Must contain a column named SMILES with the ionizable-lipid SMILES strings.
 
 - Example input file:
+
 ![alt text](image.png)
 
-2. Point the predictor to your file
+2. **Point the predictor to your file**
 
 Open Classifier/prediction.py and change the input path at the top:
 ````
@@ -50,13 +51,13 @@ Open Classifier/prediction.py and change the input path at the top:
 smiles_excel_path = repo_root / "Predictions" / "Extrapolation" / "Homoserine_smiles.xlsx"
 ````
 Replace with your file path (relative to repo root or absolute)
-````
-3. Run
+
+3. **Run**
 ````
 python Classifier/prediction.py
 ````
 
-4. Output
+4. **Output**
 - A prediction file is written next to your input file.
 - File name: <your_input_name>_predictions.csv
 - with the following columns:
