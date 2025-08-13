@@ -3,42 +3,62 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
+# --- config ---
 repo_root = Path(__file__).resolve().parent.parent
-data_dir  = repo_root / "Generation of novel lipids"
-out_dir   = repo_root / "Figures" / "PDF"
+data_dir   = repo_root / "Generation of novel lipids"   # adjust if needed
+out_dir    = repo_root / "Figures" / "PDF"
 out_dir.mkdir(parents=True, exist_ok=True)
 
-# One CSV per set (single numeric column with similarities)
+# If you have a training-set nearest-neighbor CSV, put it here; otherwise it’ll be skipped.
 files = {
-    "Training NN": data_dir / "tanimoto_training_nn.csv",     # leave-one-out NN on training set
+    "Training NN": data_dir / "tanimoto_training_nn.csv",          # optional
     "STONED 0.8":  data_dir / "tanimoto_STONED_0.8.csv",
     "STONED 0.6":  data_dir / "tanimoto_STONED_0.6.csv",
     "STONED 0.4":  data_dir / "tanimoto_STONED_0.4.csv",
 }
 
-def load_sims(path: Path, every=100):
-    s = pd.read_csv(path, header=0).select_dtypes(include=[np.number]).iloc[:,0]
-    return pd.to_numeric(s, errors="coerce").dropna().values[::every]
+# subsample factor: take every 100th value
+SUBSAMPLE = 100
 
-bins = np.linspace(0.0, 1.0, 41)
+# columns we’ll try to read from each CSV (first match wins)
+candidate_cols = ("tanimoto", "nn_tanimoto", "similarity", "NearestNeighbor")
 
-plt.figure(figsize=(12, 7))
+palette = {
+    "Training NN": "#CFD8DC",
+    "STONED 0.8":  "#EDC07B",
+    "STONED 0.6":  "#F3DF9A",
+    "STONED 0.4":  "#9FC5C8",
+}
 
-# plot training first so others overlay it
-order = ["Training NN", "STONED 0.8", "STONED 0.6", "STONED 0.4"]
-for label in order:
-    f = files[label]
-    if not f.exists():
-        print(f"[skip] {label}: {f} not found")
+def load_similarities(path: Path) -> np.ndarray:
+    df = pd.read_csv(path)
+    for c in candidate_cols:
+        if c in df.columns:
+            s = pd.to_numeric(df[c], errors="coerce").dropna().values
+            return s[::SUBSAMPLE]
+    # fallback: first numeric column
+    num_cols = df.select_dtypes(include=[np.number]).columns
+    if len(num_cols) == 0:
+        raise ValueError(f"No numeric columns found in {path}")
+    s = pd.to_numeric(df[num_cols[0]], errors="coerce").dropna().values
+    return s[::SUBSAMPLE]
+
+# --- plot ---
+plt.figure(figsize=(10, 6))
+bins = np.linspace(0.0, 1.0, 41)   # old version: full range 0–1
+
+for label, fpath in files.items():
+    if not fpath.exists():
+        print(f"[skip] {label}: file not found -> {fpath}")
         continue
-    vals = load_sims(f, every=100)  # subsample every 100th value
-    alpha = 0.35 if label == "Training NN" else 0.8
-    plt.hist(vals, bins=bins, density=True, alpha=alpha, edgecolor="none", label=label)
+    vals = load_similarities(fpath)
+    plt.hist(vals, bins=bins, density=True, alpha=0.85, edgecolor="none",
+             color=palette.get(label, None), label=label)
 
 plt.xlabel("Nearest-neighbor ECFP4 Tanimoto to training set")
 plt.ylabel("Density")
 plt.title("Domain overlap and breadth by similarity bin")
 plt.legend(frameon=False, loc="upper left")
 plt.tight_layout()
-plt.savefig(out_dir / "NN_Tanimoto_overlap_bins_with_training.pdf")
+plt.savefig(out_dir / "NN_Tanimoto_overlap_bins_subsampled.pdf")
 plt.show()
