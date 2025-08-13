@@ -33,3 +33,38 @@ pip install -r requirements.txt
 ````
 
 # Usage
+1. Prepare your input file
+
+- Format: .csv or .xlsx
+
+- Must contain a column named SMILES with the ionizable-lipid SMILES strings.
+
+- Example input file:
+![alt text](image.png)
+
+2. Point the predictor to your file
+
+Open Classifier/prediction.py and change the input path at the top:
+````
+# File to predict on (CSV or XLSX)
+smiles_excel_path = repo_root / "Predictions" / "Extrapolation" / "Homoserine_smiles.xlsx"
+````
+Replace with your file path (relative to repo root or absolute)
+````
+3. Run
+````
+python Classifier/prediction.py
+````
+
+4. Output
+- A prediction file is written next to your input file.
+- File name: <your_input_name>_predictions.csv
+- with the following columns:
+    - SMILES
+    - pred_prob (classifier probability for assigned class)
+    - pred_label (0 or 1 - 1 corresponds to the working class and 0 to the none)
+
+# Input requirements & Tips
+- Valid SMILES only. Invalid/uncanonicalizable SMILES will be reported and skipped.
+- No headers other than SMILES are required. Additional columns are allowed.
+- The model was trained on a specific experimental setup and cell line; predictions are most reliable within the training domain (see paper for domain and cell-line notes).
